@@ -1,0 +1,69 @@
+<script>
+  $(document).ready(function(){
+    $('#addUser').on('click',function(){
+      $('.overlay').show();
+      $('.loaderimg').show();
+      // checks if userid is null or empty value
+      if($('#userId').val()=="" || $('#userId').val()==null){
+        alert('User Id cannot be null!');
+      }
+      //consolidating data into json format to be sent through post request
+      const data = {userId:$('#userId').val(), emailId:$('#emailId').val(), phoneNo:$('#phoneNo').val()}
+      console.log(data);
+      // post request to hit API at backend
+      $.post('/addUser', data, (res) => {
+        console.log(res);
+        $('.overlay').hide();
+      $('.loaderimg').hide();
+        if(res.status=="OK"){
+          location.reload();
+        }
+        // checking postgres error code for unique key constraint
+        else if(res.errorCode == 23505){
+          alert('User Id already exists');
+        }
+      });
+    });
+  });
+</script>
+
+<body>
+
+<h1><i>Gamezop Task- Node.js</i></h1>
+
+<div>
+    <div class="row inputs">
+    <div class="col-md-2 col-md-offset-4 "><span>Enter User Id:</span></div><div class="col-md-6"><input type="text" id="userId" name="userId" placeholder="User ID"></div>
+    </div>
+    <div class="row inputs">
+    <div class="col-md-2 col-md-offset-4 "><span>Enter Email Id:</span></div><div class="col-md-6"><input type="text" id="emailId" name="emailId" placeholder="Email ID"></div>
+    </div>
+    <div class="row inputs">
+    <div class="col-md-2 col-md-offset-4 "><span>Enter Phone Number:</span></div><div class="col-md-6"><input type="text" id="phoneNo" name="phoneNo" placeholder="Phone Number"></div>
+    </div>
+    <div class="row inputs">
+    <div class="button"><button class="btn btn-danger" id="addUser">Submit</button></div>
+    </div>
+    </div>
+
+    <table class="table table-striped">
+        <tr>
+            <th>User Id</th>
+            <th>Email Id</th>
+            <th>Phone Number</th>
+        </tr>
+        {{!-- loop to display all the records fetched from database --}}
+        {{#each records}}
+        <tr>
+            <td>{{{this.user_id}}}</td>
+            <td>{{{this.email_id}}}</td>
+            <td>{{{this.phone_no}}}</td>
+        </tr>
+         {{/each}}
+    </table>
+    {{!-- spinny loader --}}
+    <div class="overlay" style="display:none">      
+    </div>
+    <img class="loaderimg" style="display:none" src="../images/loader.gif">
+
+</body>
